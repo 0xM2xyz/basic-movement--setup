@@ -62,13 +62,66 @@ module custom_counter::custom_counter {
     counter.value = counter.value + 1;
   }
 
+
+  public fun increment_and_store(counter: &mut Counter,collectionCounters: &mut CountersCollection) {
+    let i = 0;
+    let address_of_counter = object::uid_to_address( &counter.id);
+    while (i < vector::length(& collectionCounters.counters)) 
+    {
+      let counterFetched = vector::borrow_mut(& mut collectionCounters.counters, i);
+        if(counterFetched.id == address_of_counter)
+        {
+          counterFetched.value = counterFetched.value+1; 
+        }
+    };
+    counter.value = counter.value + 1;
+  }
+
   public fun getCounts (collectionCounters: &mut CountersCollection ) : vector<CounterStored>
   {
     return collectionCounters.counters
   }
   /// Set value (only runnable by the Counter owner)
-  public fun set_value(counter: &mut Counter, value: u64, ctx: &TxContext) {
+  public fun set_value(counter: &mut Counter, value: u64,  ctx: &TxContext) {
     assert!(counter.owner == ctx.sender(), 0);
     counter.value = value;
   }
+
+  public fun set_value_and_store(counter: &mut Counter, value: u64,  collectionCounters: &mut CountersCollection,ctx: &TxContext) {
+    assert!(counter.owner == ctx.sender(), 0);
+    counter.value = value;
+    let i = 0;
+    let address_of_counter = object::uid_to_address( &counter.id);
+    while (i < vector::length(& collectionCounters.counters)) 
+    {
+      let counterFetched = vector::borrow_mut(& mut collectionCounters.counters, i);
+        if(counterFetched.id == address_of_counter)
+        {
+          counterFetched.value = value; 
+        }
+    };
+  }
+
+  public fun reset_value(counter: &mut Counter,   ctx: &TxContext) {
+    assert!(counter.owner == ctx.sender(), 0);
+    counter.value = 0;
+  }
+
+  public fun reset_value_and_store(counter: &mut Counter,   collectionCounters: &mut CountersCollection,ctx: &TxContext) {
+    assert!(counter.owner == ctx.sender(), 0);
+    counter.value = 0;
+    let i = 0;
+    let address_of_counter = object::uid_to_address( &counter.id);
+    while (i < vector::length(& collectionCounters.counters)) 
+    {
+      let counterFetched = vector::borrow_mut(& mut collectionCounters.counters, i);
+        if(counterFetched.id == address_of_counter)
+        {
+          counterFetched.value = 0; 
+        }
+    };
+  }
+  
+  
+  
 }
